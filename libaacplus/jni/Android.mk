@@ -5,12 +5,6 @@ LOCAL_MODULE_TAGS := optional
 #this is the target being built
 LOCAL_MODULE:= libheaacEncInterface
 
-LOCAL_CFLAGS := -std=c99
-
-TARGET_ARCH:=ARM
-
-LOCAL_ARM_MODE:= arm
-
 define all-c-files-under
 $(patsubst ./%,%,$(shell find $(LOCAL_PATH) -name "platform" -prune -o -name "*.c" -and -not -name ".*"))
 endef
@@ -30,8 +24,15 @@ LOCAL_C_INCLUDES += \
 $(JNI_H_INCLUDES)\
 $(LOCAL_PATH)
 
-#link libs (ex logs)
-LOCAL_LDLIBS := -llog
+LOCAL_CFLAGS := -D__cpusplus -g -mfloat-abi=softfp -mfpu=neon -march=armv7-a -mtune=cortex-a8
+LOCAL_LDLIBS := -lz -llog
+TARGET_ARCH_ABI :=armeabi-v7a
+LOCAL_ARM_MODE := arm
+
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+	# 采用NEON优化技术
+	LOCAL_ARM_NEON := true
+endif
 
 LOCAL_PRELINK_MODULE := false
 include $(BUILD_SHARED_LIBRARY)
